@@ -38,8 +38,8 @@ IDO_CONTRACT_ABI = [
     }
 ]
 
-# Corrected checksum address call using Web3 class
-ido_contract = web3.eth.contract(address=web3.utils.toChecksumAddress(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
+# Correct checksum address call using Web3.toChecksumAddress
+ido_contract = web3.eth.contract(address=Web3.toChecksumAddress(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
 
 # USDC contract ABI to interact with the USDC token
 USDC_ABI = [
@@ -127,4 +127,3 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
-
