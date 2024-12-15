@@ -1,5 +1,7 @@
 from web3 import Web3
 import time
+from dotenv import load_dotenv
+import os
 
 # Wallet and Network Configuration
 WALLET_ADDRESS = 'YOUR_WALLET_ADDRESS'
