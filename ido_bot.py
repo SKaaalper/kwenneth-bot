@@ -38,7 +38,8 @@ IDO_CONTRACT_ABI = [
     }
 ]
 
-ido_contract = web3.eth.contract(address=web3.toChecksumAddress(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
+# Correct the toChecksumAddress method call
+ido_contract = web3.eth.contract(address=Web3.toChecksumAddress(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
 
 # USDC contract ABI to interact with the USDC token
 USDC_ABI = [
@@ -70,7 +71,7 @@ USDC_ABI = [
     },
 ]
 
-usdc_contract = web3.eth.contract(address=web3.toChecksumAddress(USDC_ADDRESS), abi=USDC_ABI)
+usdc_contract = web3.eth.contract(address=Web3.toChecksumAddress(USDC_ADDRESS), abi=USDC_ABI)
 
 # Gas Price Configuration
 gas_price = web3.toWei('5', 'gwei')  # Adjust gas price as necessary
@@ -126,4 +127,3 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
-
