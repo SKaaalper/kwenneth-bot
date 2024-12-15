@@ -39,7 +39,7 @@ IDO_CONTRACT_ABI = [
 ]
 
 # Corrected checksum address call using Web3 class
-ido_contract = web3.eth.contract(address=Web3.toChecksumAddress(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
+ido_contract = web3.eth.contract(address=web3.utils.toChecksumAddress(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
 
 # USDC contract ABI to interact with the USDC token
 USDC_ABI = [
