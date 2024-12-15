@@ -127,3 +127,4 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
+
