@@ -3,6 +3,9 @@ import time
 from dotenv import load_dotenv
 import os
 
+# Load environment variables from .env file
+load_dotenv()
+
 # Wallet and Network Configuration
 WALLET_ADDRESS = os.getenv('WALLET_ADDRESS')  # Enter your wallet address
 PRIVATE_KEY = os.getenv('PRIVATE_KEY')  # Enter your private key
@@ -13,7 +16,13 @@ TOKEN_AMOUNT = 1  # Amount of tokens you want to purchase (adjust as needed)
 
 # Connect to the Arbitrum network
 web3 = Web3(Web3.HTTPProvider(RPC_URL))
-assert web3.isConnected(), "Failed to connect to Arbitrum!"
+
+# Check if Web3 is connected
+if not web3.isConnected():
+    print("Failed to connect to Arbitrum!")
+    exit(1)
+else:
+    print("Successfully connected to Arbitrum.")
 
 # Load IDO Smart Contract ABI (simplified for purchase)
 IDO_CONTRACT_ABI = [
@@ -114,3 +123,4 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
+
