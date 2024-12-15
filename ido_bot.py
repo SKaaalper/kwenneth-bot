@@ -18,7 +18,7 @@ TOKEN_AMOUNT = 1  # Amount of tokens you want to purchase (adjust as needed)
 web3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Check if Web3 is connected
-if not web3.isConnected():
+if web3.provider is None or not web3.isConnected():
     print("Failed to connect to Arbitrum!")
     exit(1)
 else:
@@ -123,4 +123,3 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
-
