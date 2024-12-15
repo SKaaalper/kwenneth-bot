@@ -19,9 +19,9 @@ web3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Check if Web3 is connected
 try:
-    # Check the latest block number to verify connection
-    web3.eth.blockNumber
-    print("Successfully connected to Arbitrum.")
+    # Check if we can retrieve the latest block
+    latest_block = web3.eth.get_block('latest')
+    print("Successfully connected to Arbitrum. Latest block:", latest_block['number'])
 except Exception as e:
     print("Failed to connect to Arbitrum!")
     print(f"Error: {e}")
