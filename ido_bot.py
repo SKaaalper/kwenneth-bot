@@ -18,11 +18,14 @@ TOKEN_AMOUNT = 1  # Amount of tokens you want to purchase (adjust as needed)
 web3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Check if Web3 is connected
-if web3.provider is None or not web3.isConnected():
-    print("Failed to connect to Arbitrum!")
-    exit(1)
-else:
+try:
+    # Check the latest block number to verify connection
+    web3.eth.blockNumber
     print("Successfully connected to Arbitrum.")
+except Exception as e:
+    print("Failed to connect to Arbitrum!")
+    print(f"Error: {e}")
+    exit(1)
 
 # Load IDO Smart Contract ABI (simplified for purchase)
 IDO_CONTRACT_ABI = [
@@ -123,3 +126,4 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
+
