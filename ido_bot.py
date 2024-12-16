@@ -40,7 +40,9 @@ IDO_CONTRACT_ABI = [
 ]
 
 # Correct checksum address call
-ido_contract = web3.eth.contract(address=Web3.to_checksum_address(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
+ido_contract_address = Web3.toChecksumAddress(IDO_CONTRACT_ADDRESS)  # Use toChecksumAddress explicitly
+
+ido_contract = web3.eth.contract(address=ido_contract_address, abi=IDO_CONTRACT_ABI)
 
 # USDC contract ABI to interact with the USDC token
 USDC_ABI = [
@@ -64,7 +66,7 @@ USDC_ABI = [
 ]
 
 # Initialize USDC contract
-usdc_contract = web3.eth.contract(address=Web3.to_checksum_address(USDC_ADDRESS), abi=USDC_ABI)
+usdc_contract = web3.eth.contract(address=Web3.toChecksumAddress(USDC_ADDRESS), abi=USDC_ABI)
 
 # Gas Price Configuration
 gas_price = Web3.toWei('30', 'gwei')  # Adjust gas price as necessary
