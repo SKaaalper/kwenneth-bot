@@ -7,19 +7,20 @@ import os
 load_dotenv()
 
 # Wallet and Network Configuration
-WALLET_ADDRESS = os.getenv('WALLET_ADDRESS')  # Enter your wallet address
-PRIVATE_KEY = os.getenv('PRIVATE_KEY')  # Enter your private key
-RPC_URL = 'https://arb1.arbitrum.io/rpc'  # Arbitrum RPC URL
-IDO_CONTRACT_ADDRESS = os.getenv('IDO_CONTRACT_ADDRESS')  # Enter the correct sale contract address
-USDC_ADDRESS = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8'  # USDC Address on Arbitrum
-TOKEN_AMOUNT = 1  # Amount of tokens you want to purchase (adjust as needed)
+WALLET_ADDRESS = os.getenv('WALLET_ADDRESS')  # Your wallet address
+PRIVATE_KEY = os.getenv('PRIVATE_KEY')        # Your private key
+RPC_URL = 'https://arb1.arbitrum.io/rpc'      # Arbitrum RPC URL
+IDO_CONTRACT_ADDRESS = os.getenv('IDO_CONTRACT_ADDRESS')  # IDO contract address
+USDC_ADDRESS = '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8'  # USDC contract address on Arbitrum
+
+# Token purchase configuration
+BUY_AMOUNT_USDC = float(os.getenv('BUY_AMOUNT_USDC', 1))  # Amount of USDC to spend (default 1 USDC)
 
 # Connect to the Arbitrum network
 web3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Check if Web3 is connected
 try:
-    # Check if we can retrieve the latest block
     latest_block = web3.eth.get_block('latest')
     print("Successfully connected to Arbitrum. Latest block:", latest_block['number'])
 except Exception as e:
@@ -38,20 +39,11 @@ IDO_CONTRACT_ABI = [
     }
 ]
 
-# Correct checksum address call using Web3.toChecksumAddress
+# Correct checksum address call
 ido_contract = web3.eth.contract(address=Web3.to_checksum_address(IDO_CONTRACT_ADDRESS), abi=IDO_CONTRACT_ABI)
 
 # USDC contract ABI to interact with the USDC token
 USDC_ABI = [
-    {
-        "constant": True,
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [{"name": "", "type": "uint8"}],
-        "payable": False,
-        "stateMutability": "view",
-        "type": "function"
-    },
     {
         "constant": True,
         "inputs": [{"name": "account", "type": "address"}],
@@ -71,7 +63,8 @@ USDC_ABI = [
     },
 ]
 
-usdc_contract = web3.eth.contract(address=Web3.toChecksumAddress(USDC_ADDRESS), abi=USDC_ABI)
+# Initialize USDC contract
+usdc_contract = web3.eth.contract(address=Web3.to_checksum_address(USDC_ADDRESS), abi=USDC_ABI)
 
 # Gas Price Configuration
 gas_price = web3.toWei('5', 'gwei')  # Adjust gas price as necessary
@@ -79,21 +72,24 @@ gas_price = web3.toWei('5', 'gwei')  # Adjust gas price as necessary
 # Function to Buy Tokens
 def buy_tokens():
     try:
+        # Convert USDC amount to correct decimal format (USDC uses 6 decimals)
+        buy_amount_in_wei = int(BUY_AMOUNT_USDC * 10**6)
+
         # Check USDC balance before attempting purchase
         usdc_balance = usdc_contract.functions.balanceOf(WALLET_ADDRESS).call()
-        print(f"USDC balance: {web3.fromWei(usdc_balance, 'ether')} USDC")
+        print(f"USDC balance: {usdc_balance / 10**6} USDC")
 
         # Make sure the wallet has enough USDC to buy tokens
-        if usdc_balance < web3.toWei(TOKEN_AMOUNT, 'ether'):
-            print(f"Not enough USDC to purchase {TOKEN_AMOUNT} tokens.")
+        if usdc_balance < buy_amount_in_wei:
+            print(f"Not enough USDC to purchase {BUY_AMOUNT_USDC} USDC worth of tokens.")
             return
 
         # Approve the sale contract to spend USDC on behalf of the wallet
-        approve_tx = usdc_contract.functions.approve(IDO_CONTRACT_ADDRESS, usdc_balance).buildTransaction({
+        approve_tx = usdc_contract.functions.approve(IDO_CONTRACT_ADDRESS, buy_amount_in_wei).buildTransaction({
             'from': WALLET_ADDRESS,
             'gas': 100000,
             'gasPrice': gas_price,
-            'nonce': web3.eth.getTransactionCount(WALLET_ADDRESS)
+            'nonce': web3.eth.getTransactionCount(WALLET_ADDRESS),
         })
         signed_approve_tx = web3.eth.account.sign_transaction(approve_tx, PRIVATE_KEY)
         tx_hash = web3.eth.sendRawTransaction(signed_approve_tx.rawTransaction)
@@ -102,12 +98,13 @@ def buy_tokens():
         # Wait for the approval to be mined
         web3.eth.waitForTransactionReceipt(tx_hash)
 
-        # Purchase tokens using USDC
-        purchase_tx = ido_contract.functions.purchase(web3.toWei(TOKEN_AMOUNT, 'ether')).buildTransaction({
+        # Purchase tokens using the approved USDC
+        purchase_tx = ido_contract.functions.purchase().buildTransaction({
             'from': WALLET_ADDRESS,
             'gas': 200000,
             'gasPrice': gas_price,
-            'nonce': web3.eth.getTransactionCount(WALLET_ADDRESS) + 1  # Ensure unique nonce
+            'nonce': web3.eth.getTransactionCount(WALLET_ADDRESS) + 1,  # Ensure unique nonce
+            'value': 0  # Assuming the function does not require ETH payment
         })
 
         # Sign the purchase transaction
@@ -127,4 +124,5 @@ def buy_tokens():
 if __name__ == '__main__':
     print("Starting IDO bot on Arbitrum with USDC...")
     buy_tokens()
+
 
