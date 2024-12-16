@@ -67,7 +67,7 @@ USDC_ABI = [
 usdc_contract = web3.eth.contract(address=Web3.to_checksum_address(USDC_ADDRESS), abi=USDC_ABI)
 
 # Gas Price Configuration
-gas_price = Web3.toWei('5', 'gwei')  # Adjust gas price as necessary
+gas_price = web3.web3.toWei('5', 'gwei')  # Adjust gas price as necessary
 
 # Function to Buy Tokens
 def buy_tokens():
